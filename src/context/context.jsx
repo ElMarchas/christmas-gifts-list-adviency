@@ -4,8 +4,8 @@ export const GiftsContext = createContext([]);
 
 export const GiftsProvider = ({ children }) => {
   const [gifts, setGifts] = useState(() => {
-    const localGifts = localStorage.getItem("gifts");
-    return localGifts ? JSON.parse(localGifts) : [];
+    const savedGifts = localStorage.getItem("gifts");
+    return savedGifts ? JSON.parse(savedGifts) : [];
   });
 
   const addGift = (gift) => {
