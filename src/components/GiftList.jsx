@@ -11,47 +11,68 @@ import {
   InputRightElement,
   Button,
   Image,
+  Divider,
+  Text,
 } from "@chakra-ui/react";
 
-import { useState, useContext } from "react";
+import { useContext } from "react";
 import { GiftsContext } from "../context/Context";
+import { DrawerNewGift } from "./DrawerGift";
+import { ModalNewGift } from "./ModalPrint";
 
 function EmptyGiftList(params) {
   return <h1>No hay nada perro</h1>;
 }
 
 function FullGiftList(params) {
-  const { gifts, deleteAllGifts, deleteGift } = useContext(GiftsContext);
-  const handleRemoveItem = (e) => {
-    const btnid = Number(e.target.getAttribute("data-btnid"));
-    deleteGift(btnid);
+  const { gifts, deleteAllGifts, deleteGift, totalPrice } =
+    useContext(GiftsContext);
+  const handleRemoveItem = (index) => {
+    deleteGift(index);
   };
   return (
     <Stack>
-      {gifts.map((item) => {
+      <Heading>Gifts:</Heading>
+      {gifts.map((item, index) => {
         return (
           <Box backgroundColor="brand.200" color="red.700" key={item.id}>
-            {item.gift + " : " + item.units + " : " + item.receiver}
+            {item.gift +
+              " : " +
+              item.units +
+              " : " +
+              item.receiver +
+              " : $" +
+              (item.price * item.units).toFixed(2)}
             <Image
               boxSize="100px"
               objectFit="cover"
               src={item.picture}
-              alt="Dan Abramov"
+              alt="Image"
+            />
+            <DrawerNewGift
+              gift={item}
+              layout={{ action: "edit", header: "Edit Gift:", layer: "Edit" }}
+            />
+            <DrawerNewGift
+              gift={item}
+              layout={{ action: "copy", header: "New Gift:", layer: "edit" }}
             />
             <Button
               colorScheme="pink"
               data-btnid={item.id}
-              onClick={handleRemoveItem}
+              onClick={() => handleRemoveItem(index)}
             >
               Delete
             </Button>
           </Box>
         );
       })}
-
+      <Divider />
+      <Text fontWeight="semibold">Total: ${totalPrice()}</Text>
       <Button colorScheme="pink" onClick={deleteAllGifts}>
         Delete All
       </Button>
+      <ModalNewGift />
     </Stack>
   );
 }

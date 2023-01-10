@@ -1,5 +1,6 @@
-import { useState, useContext, useRef } from "react";
+import { useState, useContext, useRef, useEffect } from "react";
 import { GiftsContext } from "../context/Context.jsx";
+import { RANDOMGIFTS } from "../../public/RandomGifts";
 
 import {
   useDisclosure,
@@ -26,33 +27,58 @@ import {
   FormHelperText,
 } from "@chakra-ui/react";
 
-function ModalNewGift() {
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const btnRef = useRef();
+function DrawerNewGift(props) {
+  const { gifts, addGift, updateGift } = useContext(GiftsContext);
 
-  const [formData, setformData] = useState({
-    gift: "",
-    units: "",
-    picture: "",
-    receiver: "",
+  const { isOpen, onOpen, onClose } = useDisclosure();
+
+  const btnRef = useRef();
+  const firstField = useRef();
+  const secondField = useRef();
+
+  const [formData, setFormData] = useState({
+    id: props.gift ? props.gift.id : "",
+    gift: props.gift ? props.gift.gift : "",
+    units: props.gift
+      ? props.layout.action === "copy"
+        ? ""
+        : props.gift.units
+      : "",
+    picture: props.gift ? props.gift.picture : "",
+    receiver: props.gift
+      ? props.layout.action === "copy"
+        ? ""
+        : props.gift.receiver
+      : "",
+    price: props.gift ? props.gift.price : "",
   });
 
   const [isError, setisError] = useState(false);
 
   const [errorMessage, seterrorMessage] = useState("");
 
-  const { gifts, addGift } = useContext(GiftsContext);
-
   function handleSubmit(e) {
     e.preventDefault();
 
+    if (formData.units === "") {
+      formData.units = 1;
+    }
+    if (formData.picture === "") {
+      formData.picture = "/default.jpg";
+    }
+    if (formData.receiver === "") {
+      formData.receiver = "El Marchas";
+    }
+
     const idGift = gifts.length > 0 ? gifts[gifts.length - 1].id : 0;
+
     if (formData.gift === "") {
       seterrorMessage("Gift is required.");
       setisError(true);
       return;
     }
 
+    /*
     const isFound = gifts.some((gift) => {
       if (gift.gift === formData.gift) {
         return true;
@@ -64,21 +90,27 @@ function ModalNewGift() {
       setisError(true);
       return;
     }
+    */
 
-    if (formData.picture === "") {
-      formData.picture =
-        "https://i.pinimg.com/originals/c6/21/5d/c6215d6d34f6dd4ad82b5b8244daa870.jpg";
+    if (props.layout.action === "edit") {
+      updateGift(props.gift.id, {
+        id: props.gift.id,
+        gift: formData.gift,
+        units: formData.units,
+        picture: formData.picture,
+        receiver: formData.receiver,
+        price: formData.price,
+      });
+    } else {
+      addGift({
+        id: idGift + 1,
+        gift: formData.gift,
+        units: formData.units,
+        picture: formData.picture,
+        receiver: formData.receiver,
+        price: formData.price,
+      });
     }
-
-    console.log(formData);
-    addGift({
-      id: idGift + 1,
-      gift: formData.gift,
-      units: formData.units,
-      picture: formData.picture,
-      receiver: formData.receiver,
-    });
-    console.log(gifts);
 
     onClose();
   }
@@ -87,24 +119,53 @@ function ModalNewGift() {
     const value = e.target.value;
     if (e.target.value !== "") setisError(false);
 
-    setformData({ ...formData, [e.target.name]: e.target.value });
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  }
+
+  function handleOpen() {
+    onOpen();
+  }
+
+  function handleClose() {
+    onClose();
+  }
+
+  function handleRandom() {
+    const randomItem = Math.floor(Math.random() * RANDOMGIFTS.length);
+    const randomGift = RANDOMGIFTS[randomItem];
+
+    console.log(randomGift);
+
+    setFormData({
+      ...formData,
+      gift: randomGift.gift,
+      units: randomGift.units,
+      picture: randomGift.picture,
+      price: randomGift.price,
+    });
   }
 
   return (
     <>
-      <Button ref={btnRef} colorScheme="teal" onClick={onOpen}>
-        Open
+      <Button ref={btnRef} colorScheme="pink" onClick={handleOpen}>
+        {props.layout.action}
       </Button>
       <Drawer
         isOpen={isOpen}
         placement="top"
-        onClose={onClose}
+        onClose={handleClose}
+        initialFocusRef={
+          props.layout.action === "copy" ? secondField : firstField
+        }
         finalFocusRef={btnRef}
       >
         <DrawerOverlay />
         <DrawerContent>
           <DrawerCloseButton />
-          <DrawerHeader>New Gift:</DrawerHeader>
+          <DrawerHeader>
+            {props.layout.header}
+            {props.layout.action === "edit" && formData.id}
+          </DrawerHeader>
 
           <DrawerBody>
             <Stack as="form" onSubmit={handleSubmit}>
@@ -117,17 +178,20 @@ function ModalNewGift() {
                     children="🎁"
                   />
                   <Input
+                    ref={firstField}
                     placeholder="what do you wish?"
                     type="text"
                     name="gift"
                     value={formData.gift}
                     onChange={handleChange}
                   />
-                  <InputRightElement width="4.5rem">
-                    <Button w="300px" type="submit">
-                      Add
-                    </Button>
-                  </InputRightElement>
+                  {props.layout.action === "add" && (
+                    <InputRightElement width="6.5rem">
+                      <Button w="200px" onClick={handleRandom}>
+                        Random
+                      </Button>
+                    </InputRightElement>
+                  )}
                 </InputGroup>
                 {isError && <FormErrorMessage>{errorMessage}</FormErrorMessage>}
                 <InputGroup>
@@ -138,6 +202,7 @@ function ModalNewGift() {
                     children="#️⃣"
                   />
                   <Input
+                    ref={secondField}
                     placeholder="How many?"
                     type="text"
                     name="units"
@@ -168,10 +233,25 @@ function ModalNewGift() {
                     children="🖼️"
                   />
                   <Input
-                    placeholder="URL of image of that"
+                    placeholder="Image link (URL)"
                     type="text"
                     name="picture"
                     value={formData.picture}
+                    onChange={handleChange}
+                  />
+                </InputGroup>
+                <InputGroup>
+                  <InputLeftElement
+                    pointerEvents="none"
+                    color="gray.300"
+                    fontSize="1.2em"
+                    children="🪙"
+                  />
+                  <Input
+                    placeholder="Price"
+                    type="text"
+                    name="price"
+                    value={formData.price}
                     onChange={handleChange}
                   />
                 </InputGroup>
@@ -180,11 +260,11 @@ function ModalNewGift() {
           </DrawerBody>
 
           <DrawerFooter>
-            <Button variant="outline" mr={3} onClick={onClose}>
+            <Button variant="outline" mr={3} onClick={handleClose}>
               Cancel
             </Button>
             <Button colorScheme="blue" onClick={handleSubmit}>
-              Save
+              Accept
             </Button>
           </DrawerFooter>
         </DrawerContent>
@@ -193,4 +273,4 @@ function ModalNewGift() {
   );
 }
 
-export default ModalNewGift;
+export { DrawerNewGift };
