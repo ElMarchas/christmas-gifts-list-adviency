@@ -18,12 +18,12 @@ function Layout() {
   const snowWaifu4 = document.createElement("img");
   const snowWaifu5 = document.createElement("img");
   const snowWaifu6 = document.createElement("img");
-  snowWaifu1.src = "../src/assets/waifus/bocchi.png";
-  snowWaifu2.src = "../src/assets/waifus/chisato.webp";
-  snowWaifu3.src = "../src/assets/waifus/tomoko.png";
-  snowWaifu4.src = "../src/assets/waifus/4ee.png";
-  snowWaifu5.src = "../src/assets/waifus/lucoa.png";
-  snowWaifu6.src = "../src/assets/waifus/megumin.png";
+  snowWaifu1.src = "/bocchi.png";
+  snowWaifu2.src = "/chisato.webp";
+  snowWaifu3.src = "/tomoko.png";
+  snowWaifu4.src = "/4ee.png";
+  snowWaifu5.src = "/lucoa.png";
+  snowWaifu6.src = "/megumin.png";
   const images = [
     snowWaifu1,
     snowWaifu2,
