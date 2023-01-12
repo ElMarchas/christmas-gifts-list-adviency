@@ -5,7 +5,6 @@ import {
   Modal,
   ModalOverlay,
   ModalContent,
-  ModalHeader,
   ModalFooter,
   ModalBody,
   ModalCloseButton,
@@ -14,10 +13,11 @@ import {
   Box,
   Image,
   Heading,
+  Stack,
 } from "@chakra-ui/react";
 import ReactToPrint from "react-to-print";
 
-function ModalNewGift() {
+function ModalPrint() {
   const { gifts } = useContext(GiftsContext);
   const { isOpen, onOpen, onClose } = useDisclosure();
 
@@ -25,7 +25,9 @@ function ModalNewGift() {
 
   return (
     <>
-      <Button onClick={onOpen}>Preview</Button>
+      <Button border="2px" borderColor="brand.300" onClick={onOpen}>
+        Preview
+      </Button>
 
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
@@ -35,15 +37,30 @@ function ModalNewGift() {
             <Heading>To buy:</Heading>
             {gifts.map((item, index) => {
               return (
-                <Box backgroundColor="brand.200" color="red.700" key={item.id}>
-                  {item.gift + " : " + item.units + " : " + item.receiver}
+                <Stack key={item.id} direction="row" p={2}>
                   <Image
-                    boxSize="100px"
+                    boxSize="80px"
                     objectFit="cover"
                     src={item.picture}
                     alt="Image"
                   />
-                </Box>
+                  <Stack>
+                    <Box>
+                      <Text fontSize="md">
+                        {item.gift +
+                          " (" +
+                          item.units +
+                          ")" +
+                          " - $" +
+                          (item.price * item.units).toFixed(2)}
+                      </Text>
+
+                      <Text fontSize="xs" color="gray.600">
+                        {item.receiver}
+                      </Text>
+                    </Box>
+                  </Stack>
+                </Stack>
               );
             })}
           </ModalBody>
@@ -64,4 +81,4 @@ function ModalNewGift() {
   );
 }
 
-export { ModalNewGift };
+export { ModalPrint };

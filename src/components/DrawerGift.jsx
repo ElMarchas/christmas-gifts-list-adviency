@@ -13,18 +13,12 @@ import {
   DrawerOverlay,
   DrawerContent,
   DrawerCloseButton,
-  Flex,
-  Center,
   Stack,
-  Heading,
-  Box,
   InputGroup,
   InputLeftElement,
-  InputRightAddon,
   InputRightElement,
   FormControl,
   FormErrorMessage,
-  FormHelperText,
 } from "@chakra-ui/react";
 
 function DrawerNewGift(props) {
@@ -55,42 +49,20 @@ function DrawerNewGift(props) {
 
   const [isError, setisError] = useState(false);
 
-  const [errorMessage, seterrorMessage] = useState("");
-
   function handleSubmit(e) {
     e.preventDefault();
-
-    if (formData.units === "") {
-      formData.units = 1;
-    }
-    if (formData.picture === "") {
-      formData.picture = "/default.jpg";
-    }
-    if (formData.receiver === "") {
-      formData.receiver = "El Marchas";
-    }
 
     const idGift = gifts.length > 0 ? gifts[gifts.length - 1].id : 0;
 
     if (formData.gift === "") {
-      seterrorMessage("Gift is required.");
       setisError(true);
       return;
     }
 
-    /*
-    const isFound = gifts.some((gift) => {
-      if (gift.gift === formData.gift) {
-        return true;
-      }
-    });
-
-    if (isFound) {
-      seterrorMessage("Gift already exist, try another");
-      setisError(true);
-      return;
-    }
-    */
+    if (formData.units === "") formData.units = 1;
+    if (formData.picture === "") formData.picture = "/default.jpg";
+    if (formData.receiver === "") formData.receiver = "El Marchas";
+    if (formData.price === "") formData.price = 1;
 
     if (props.layout.action === "edit") {
       updateGift(props.gift.id, {
@@ -134,8 +106,6 @@ function DrawerNewGift(props) {
     const randomItem = Math.floor(Math.random() * RANDOMGIFTS.length);
     const randomGift = RANDOMGIFTS[randomItem];
 
-    console.log(randomGift);
-
     setFormData({
       ...formData,
       gift: randomGift.gift,
@@ -147,8 +117,37 @@ function DrawerNewGift(props) {
 
   return (
     <>
-      <Button ref={btnRef} colorScheme="pink" onClick={handleOpen}>
-        {props.layout.action}
+      <Button
+        size={
+          props.layout.action === "edit" || props.layout.action === "copy"
+            ? "xs"
+            : "md"
+        }
+        fontSize={
+          props.layout.action === "edit" || props.layout.action === "copy"
+            ? "xs"
+            : "md"
+        }
+        variant={
+          props.layout.action === "edit" || props.layout.action === "copy"
+            ? "outline"
+            : "solid"
+        }
+        marginInline={
+          props.layout.action === "edit" || props.layout.action === "copy"
+            ? "0.5"
+            : "0"
+        }
+        marginTop={
+          props.layout.action === "edit" || props.layout.action === "copy"
+            ? "-5"
+            : "0"
+        }
+        ref={btnRef}
+        colorScheme="brand"
+        onClick={handleOpen}
+      >
+        {props.layout.layer}
       </Button>
       <Drawer
         isOpen={isOpen}
@@ -168,7 +167,7 @@ function DrawerNewGift(props) {
           </DrawerHeader>
 
           <DrawerBody>
-            <Stack as="form" onSubmit={handleSubmit}>
+            <Stack as="form" onSubmit={handleSubmit} spacing="3">
               <FormControl isInvalid={isError}>
                 <InputGroup>
                   <InputLeftElement
@@ -193,77 +192,86 @@ function DrawerNewGift(props) {
                     </InputRightElement>
                   )}
                 </InputGroup>
-                {isError && <FormErrorMessage>{errorMessage}</FormErrorMessage>}
-                <InputGroup>
-                  <InputLeftElement
-                    pointerEvents="none"
-                    color="gray.300"
-                    fontSize="1.2em"
-                    children="#️⃣"
-                  />
-                  <Input
-                    ref={secondField}
-                    placeholder="How many?"
-                    type="text"
-                    name="units"
-                    value={formData.units}
-                    onChange={handleChange}
-                  />
-                </InputGroup>
-                <InputGroup>
-                  <InputLeftElement
-                    pointerEvents="none"
-                    color="gray.300"
-                    fontSize="1.2em"
-                    children="🫅"
-                  />
-                  <Input
-                    placeholder="Who receive?"
-                    type="text"
-                    name="receiver"
-                    value={formData.receiver}
-                    onChange={handleChange}
-                  />
-                </InputGroup>
-                <InputGroup>
-                  <InputLeftElement
-                    pointerEvents="none"
-                    color="gray.300"
-                    fontSize="1.2em"
-                    children="🖼️"
-                  />
-                  <Input
-                    placeholder="Image link (URL)"
-                    type="text"
-                    name="picture"
-                    value={formData.picture}
-                    onChange={handleChange}
-                  />
-                </InputGroup>
-                <InputGroup>
-                  <InputLeftElement
-                    pointerEvents="none"
-                    color="gray.300"
-                    fontSize="1.2em"
-                    children="🪙"
-                  />
-                  <Input
-                    placeholder="Price"
-                    type="text"
-                    name="price"
-                    value={formData.price}
-                    onChange={handleChange}
-                  />
-                </InputGroup>
+                {isError && (
+                  <FormErrorMessage fontSize="xs">
+                    Gift is required.
+                  </FormErrorMessage>
+                )}
               </FormControl>
+              <InputGroup marginTop="3">
+                <InputLeftElement
+                  pointerEvents="none"
+                  color="gray.300"
+                  fontSize="1.2em"
+                  children="#️⃣"
+                />
+                <Input
+                  ref={secondField}
+                  placeholder="How many?"
+                  type="number"
+                  name="units"
+                  value={formData.units}
+                  onChange={handleChange}
+                />
+              </InputGroup>
+              <InputGroup>
+                <InputLeftElement
+                  pointerEvents="none"
+                  color="gray.300"
+                  fontSize="1.2em"
+                  children="🫅"
+                />
+                <Input
+                  placeholder="Who receive?"
+                  type="text"
+                  name="receiver"
+                  value={formData.receiver}
+                  onChange={handleChange}
+                />
+              </InputGroup>
+              <InputGroup>
+                <InputLeftElement
+                  pointerEvents="none"
+                  color="gray.300"
+                  fontSize="1.2em"
+                  children="🖼️"
+                />
+                <Input
+                  placeholder="Image link (URL)"
+                  type="text"
+                  name="picture"
+                  value={formData.picture}
+                  onChange={handleChange}
+                />
+              </InputGroup>
+              <InputGroup>
+                <InputLeftElement
+                  pointerEvents="none"
+                  color="gray.300"
+                  fontSize="1.2em"
+                  children="🪙"
+                />
+                <Input
+                  placeholder="What's the Price?"
+                  type="number"
+                  name="price"
+                  value={formData.price}
+                  onChange={handleChange}
+                />
+              </InputGroup>
             </Stack>
           </DrawerBody>
 
           <DrawerFooter>
-            <Button variant="outline" mr={3} onClick={handleClose}>
+            <Button
+              colorScheme="brand"
+              variant="outline"
+              mr={3}
+              onClick={handleClose}
+            >
               Cancel
             </Button>
-            <Button colorScheme="blue" onClick={handleSubmit}>
+            <Button colorScheme="brand" onClick={handleSubmit}>
               Accept
             </Button>
           </DrawerFooter>

@@ -1,29 +1,16 @@
-import {
-  Flex,
-  Center,
-  Stack,
-  HStack,
-  Heading,
-  Box,
-  InputGroup,
-  InputLeftElement,
-  Input,
-  InputRightAddon,
-  InputRightElement,
-  Button,
-} from "@chakra-ui/react";
+import { Flex, Stack, Heading, Box, Divider, Spacer } from "@chakra-ui/react";
 
-import { useContext } from "react";
+import { useContext, useState, useEffect } from "react";
 import { GiftsContext } from "../context/Context";
 import Snowfall from "react-snowfall";
 
 import { DrawerNewGift } from "../components/DrawerGift";
 import AudioPlayer from "../components/AudioPlayer";
-
 import GiftList from "../components/GiftList";
 
 function Layout() {
-  const { gifts, addGift } = useContext(GiftsContext);
+  const { gifts, addGift, isRave } = useContext(GiftsContext);
+  const [seconds, setSeconds] = useState("");
 
   const snowWaifu1 = document.createElement("img");
   const snowWaifu2 = document.createElement("img");
@@ -46,33 +33,67 @@ function Layout() {
     snowWaifu6,
   ];
 
+  function handleRandom() {
+    let randomColor1 = Math.floor(Math.random() * 16777215).toString(16);
+    let randomColor2 = Math.floor(Math.random() * 16777215).toString(16);
+    let randomColor3 = Math.floor(Math.random() * 16777215).toString(16);
+
+    return `linear(to-tl, #${randomColor1}, #${randomColor2}, #${randomColor3})`;
+  }
+
+  useEffect(() => {
+    if (!isRave) return;
+    const interval = setInterval(() => {
+      setSeconds(handleRandom());
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [isRave]);
+
   return (
     <div className="App">
       <Flex
-        width={"100vw"}
-        height={"100vh"}
-        alignContent={"center"}
-        justifyContent={"center"}
-        bgImage="url('/background.jpg')"
+        width="100vw"
+        height="100vh"
+        alignItems="center"
+        justifyContent="center"
+        bgImage={
+          isRave ? "url('/backgroundRave.jpg')" : "url('/background.jpg')"
+        }
         bgPosition="center"
         bgSize="cover"
       >
-        <Center>
-          <Stack bg="white">
+        <Box
+          minH="200px"
+          maxH="600px"
+          minW="200px"
+          maxW="500px"
+          w="20rem"
+          bg="whiteAlpha.900"
+          borderRadius="2xl"
+          padding="5"
+          bgGradient={isRave ? seconds : ""}
+        >
+          <Stack direction="row" justifyContent="center">
+            <Heading>Gifts:</Heading>
+            <Spacer />
             <AudioPlayer />
+          </Stack>
+
+          <Stack mb="2">
             <DrawerNewGift
               layout={{ action: "add", header: "New Gift:", layer: "Add gift" }}
             />
+            <Divider variant="lg-color" />
+          </Stack>
+          <Stack alignItems="center">
             <GiftList />
           </Stack>
-        </Center>
+        </Box>
       </Flex>
       <Snowfall
-        // Controls the number of snowflakes that are created (default 150)
         snowflakeCount={100}
-        // Pass in the images to be used
-        images={images}
-        radius={[0.5, 50]}
+        images={isRave ? images : ""}
+        radius={isRave ? [10, 50] : [0.5, 5]}
       />
     </div>
   );

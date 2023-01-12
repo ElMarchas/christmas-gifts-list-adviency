@@ -1,42 +1,54 @@
-import {
-  Flex,
-  Center,
-  Stack,
-  HStack,
-  Heading,
-  Box,
-  InputGroup,
-  InputLeftElement,
-  Input,
-  InputRightAddon,
-  InputRightElement,
-  Button,
-} from "@chakra-ui/react";
+import { useContext, useState, useEffect, useRef } from "react";
+import { GiftsContext } from "../context/Context";
 
-import padoru from "../../public/padoru.mp3";
+import { HStack, Button } from "@chakra-ui/react";
+
+import padoru from "../assets/media/padoru.mp3";
+import santa from "../assets/media/santa.mp3";
 
 function AudioPlayer() {
-  const audio = new Audio(padoru);
-  audio.loop = true;
-  audio.volume = 0.35;
-  audio.playbackRate = 1.25;
+  const { isRave, setIsRave } = useContext(GiftsContext);
+  const [isPlaying, setIsPlaying] = useState(false);
+
+  const audioRef = useRef(new Audio(santa));
+
+  useEffect(() => {
+    audioRef.current.pause();
+    if (isRave) {
+      audioRef.current = new Audio(padoru);
+      audioRef.current.volume = 0.7;
+      audioRef.current.playbackRate = 1.25;
+      audioRef.current.loop = true;
+    } else {
+      audioRef.current = new Audio(santa);
+      audioRef.current.volume = 0.1;
+      audioRef.current.playbackRate = 1;
+      audioRef.current.loop = true;
+    }
+
+    isPlaying ? audioRef.current.play() : audioRef.current.pause();
+  }, [isPlaying, isRave]);
+
   return (
     <HStack>
       <Button
-        colorScheme="pink"
-        onClick={() => {
-          audio.play();
-        }}
+        colorScheme="brand"
+        size="xs"
+        variant="ghost"
+        fontSize="1.3rem"
+        onClick={() => setIsPlaying(!isPlaying)}
       >
-        Play
+        {isPlaying ? "⏸️" : "▶️"}
       </Button>
       <Button
-        colorScheme="pink"
+        colorScheme="brand"
+        size="xs"
         onClick={() => {
-          audio.pause();
+          if (!isPlaying && !isRave) setIsPlaying(true);
+          setIsRave(!isRave);
         }}
       >
-        Stop
+        {isRave ? "Not Padoru" : "Padoru"}
       </Button>
     </HStack>
   );
