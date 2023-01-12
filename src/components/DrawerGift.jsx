@@ -60,7 +60,7 @@ function DrawerNewGift(props) {
     }
 
     if (formData.units === "") formData.units = 1;
-    if (formData.picture === "") formData.picture = "/default.jpg";
+    if (formData.picture === "") formData.picture = "default.png";
     if (formData.receiver === "") formData.receiver = "El Marchas";
     if (formData.price === "") formData.price = 1;
 
@@ -85,6 +85,15 @@ function DrawerNewGift(props) {
     }
 
     onClose();
+
+    setFormData({
+      id: "",
+      gift: "",
+      units: "",
+      picture: "",
+      receiver: "",
+      price: "",
+    });
   }
 
   function handleChange(e) {

@@ -9,7 +9,7 @@ function EmptyGiftList() {
 }
 
 function FullGiftList() {
-  const { gifts, deleteAllGifts, deleteGift, totalPrice } =
+  const { gifts, deleteAllGifts, deleteGift, totalPrice, isRave } =
     useContext(GiftsContext);
   const handleRemoveItem = (index) => {
     deleteGift(index);
@@ -23,7 +23,7 @@ function FullGiftList() {
               <Image
                 boxSize="80px"
                 objectFit="cover"
-                src={item.picture}
+                src={isRave ? "padoruGift.gif" : item.picture}
                 alt="Image"
               />
               <Stack>
